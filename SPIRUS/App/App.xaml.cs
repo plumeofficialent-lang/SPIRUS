@@ -81,6 +81,7 @@ public partial class App : Application
         Guardian.UpdatesEnabled = !SnapshotMode;
         Guardian.UpdateFound += (info, _) => Dispatcher.BeginInvoke(() =>
             Notifications.Info("Mise à jour de SPIRUS", $"Installation de la version {info.Version.ToString(3)}… SPIRUS redémarre dans quelques secondes."));
+        Guardian.UpdateLaunched += () => Dispatcher.BeginInvoke(ExitApplication);
         Guardian.Start();
         if (Guardian.JustUpdatedFrom != null && !SnapshotMode)
             Dispatcher.BeginInvoke(() => Notifications.Info("SPIRUS est à jour", $"La version {Updater.CurrentText} est installée.", ToastKind.Success),

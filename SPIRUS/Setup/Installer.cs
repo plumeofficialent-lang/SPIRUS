@@ -207,7 +207,9 @@ public static class Installer
                 {
                     try
                     {
-                        p.Kill(true);
+                        // Pas Kill(true) : lors d'une mise à jour, cet installeur est lui-même un enfant de SPIRUS.
+                        if (p.HasExited) continue;
+                        p.Kill();
                         p.WaitForExit(5000);
                     }
                     catch (Exception)

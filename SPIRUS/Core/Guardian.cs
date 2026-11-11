@@ -48,6 +48,8 @@ public sealed class Guardian : IDisposable
     public event Action<DriveInfo> UsbArrived;
     /// <summary>Une nouvelle version a été trouvée ; le booléen indique si elle s'installe automatiquement.</summary>
     public event Action<UpdateInfo, bool> UpdateFound;
+    /// <summary>L'installeur de la nouvelle version vient d'être lancé : l'application doit se fermer.</summary>
+    public event Action UpdateLaunched;
 
     /// <summary>Activé par l'application installée (désactivé pour les outils et les captures de test).</summary>
     public bool UpdatesEnabled { get; set; }
@@ -317,6 +319,7 @@ public sealed class Guardian : IDisposable
             Log.Add(LogLevel.Success, $"Installation de SPIRUS {v}", "Empreinte SHA-256 vérifiée. SPIRUS redémarre.");
             Save();
             Updater.Install(installer);
+            UpdateLaunched?.Invoke(); // SPIRUS se ferme pour laisser l'installeur le remplacer
             return null;
         }
         catch (Exception ex)
