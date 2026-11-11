@@ -226,6 +226,9 @@ public sealed class ScanEngine : IDisposable
 
             foreach (var m in Rules.Evaluate(hits, kind, ext))
             {
+                // Comme le standard EICAR : un fichier de test est petit. Un gros fichier qui contient
+                // seulement le marqueur (index de recherche Windows, base de données, journal) n'en est pas un.
+                if (m.Rule.IsTest && s.Length > 4096) continue;
                 var shown = m.Matched.Where(p => !p.StartsWith("hex:")).Take(3).Select(p => $"« {p} »").ToList();
                 var reason = m.Rule.Desc + (shown.Count > 0 ? $" ({string.Join(", ", shown)})" : "");
                 detections.Add(new(m.Rule.Name, m.Rule.Category, m.Rule.Score, m.Rule.IsTest ? "Signature" : "Règle", reason, !m.Rule.IsTest));
@@ -274,6 +277,7 @@ public sealed class ScanEngine : IDisposable
             {
                 r.Signed = (signedScript || pe.HasEmbeddedSignature) && Authenticode.IsTrusted(fullPath);
                 if (r.Signed) factor = 0.3;
+                else if (fullPath.Contains(@"\WindowsApps\", StringComparison.OrdinalIgnoreCase)) factor = 0.3; // applications du Microsoft Store (paquets signés)
                 else if (fullPath.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.Windows), StringComparison.OrdinalIgnoreCase)) factor = 0.5;
             }
 
