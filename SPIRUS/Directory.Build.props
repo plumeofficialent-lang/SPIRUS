@@ -3,7 +3,7 @@
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <!-- Version de SPIRUS : release.ps1 la met à jour à chaque publication -->
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <Product>SPIRUS Antivirus</Product>
     <Company>SPIRUS</Company>
     <Copyright>SPIRUS</Copyright>
