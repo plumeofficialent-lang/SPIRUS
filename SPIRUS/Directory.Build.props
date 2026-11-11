@@ -1,0 +1,24 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <!-- Version de SPIRUS : release.ps1 la met à jour à chaque publication -->
+    <Version>1.1.0</Version>
+    <Product>SPIRUS Antivirus</Product>
+    <Company>SPIRUS</Company>
+    <Copyright>SPIRUS</Copyright>
+    <NeutralLanguage>fr-FR</NeutralLanguage>
+    <SatelliteResourceLanguages>fr</SatelliteResourceLanguages>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <!-- Si le projet se trouve dans un dossier au chemin très long, les fichiers
+       intermédiaires de compilation sont placés dans le dossier temporaire pour
+       éviter la limite Windows des 260 caractères. -->
+  <PropertyGroup Condition="$(MSBuildThisFileDirectory.Length) &gt; 120">
+    <VigieBuildRoot>$([System.IO.Path]::GetTempPath())vigie-build\</VigieBuildRoot>
+    <BaseIntermediateOutputPath>$(VigieBuildRoot)obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(VigieBuildRoot)bin\$(MSBuildProjectName)\</BaseOutputPath>
+  </PropertyGroup>
+</Project>

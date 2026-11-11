@@ -1,0 +1,10 @@
+# Résultats de compilation
+dist/
+bin/
+obj/
+SPIRUS/Core/Signatures/rules.vdb
+
+# Fichiers d'éditeurs
+.vs/
+.vscode/
+*.user

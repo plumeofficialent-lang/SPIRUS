@@ -1,0 +1,252 @@
+{
+  "version": "2026.11.11",
+  "hashes": [
+    { "sha256": "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f", "name": "EICAR.Test.Fichier" }
+  ],
+  "rules": [
+    {
+      "id": "VIG-T001", "name": "SPIRUS.Test.Fichier", "category": "Test", "score": 100, "targets": ["any"],
+      "desc": "Fichier de test inoffensif de SPIRUS (équivalent EICAR).",
+      "groups": [ { "of": ["hex:535049525553 2D 414E54495649525553 2D 54455354 2D 46494C45"] } ]
+    },
+    {
+      "id": "VIG-T002", "name": "EICAR.Test.Fichier", "category": "Test", "score": 100, "targets": ["any"],
+      "desc": "Fichier de test standard EICAR.",
+      "groups": [ { "of": ["hex:4549434152 2D 5354414E44415244 2D 414E54495649525553 2D 54455354 2D 46494C45"] } ]
+    },
+    {
+      "id": "VIG-R001", "name": "Rancongiciel.SuppressionSauvegardes", "category": "Rançongiciel", "score": 65, "targets": ["pe", "script", "lnk", "office"],
+      "desc": "Supprime les clichés instantanés Windows, technique typique des rançongiciels.",
+      "groups": [ { "of": ["vssadmin delete shadows", "vssadmin.exe delete shadows", "shadowcopy delete", "delete shadows /all", "wmic shadowcopy", "resize shadowstorage", "delete catalog -quiet"] } ]
+    },
+    {
+      "id": "VIG-R002", "name": "Rancongiciel.DesactivationRecuperation", "category": "Rançongiciel", "score": 55, "targets": ["pe", "script", "lnk", "office"],
+      "desc": "Désactive la récupération de Windows au démarrage.",
+      "groups": [ { "of": ["recoveryenabled no", "bootstatuspolicy ignoreallfailures", "wbadmin delete catalog", "wbadmin delete systemstatebackup"] } ]
+    },
+    {
+      "id": "VIG-R003", "name": "Rancongiciel.NoteDeRancon", "category": "Rançongiciel", "score": 70, "targets": ["pe", "script", "other"],
+      "desc": "Texte caractéristique d'une demande de rançon.",
+      "groups": [
+        { "of": ["hex:796f75722066696c65732068617665206265656e20656e63727970746564", "hex:616c6c20796f75722066696c65732061726520656e63727970746564", "hex:796f75722066696c65732061726520656e63727970746564", "hex:796f757220696d706f7274616e742066696c65732061726520656e63727970746564", "hex:746f206465637279707420796f75722066696c6573", "hex:66696c65732068617665206265656e206c6f636b6564", "hex:766f73206669636869657273206f6e7420c3a974c3a920636869666672c3a973", "hex:766f73206669636869657273206f6e7420657465206368696666726573", "hex:766f7320666963686965727320736f6e7420636869666672c3a973"] },
+        { "of": ["bitcoin", "btc wallet", "monero", "tor browser", ".onion", "decryption key", "decryptor", "private key", "ransom"] }
+      ]
+    },
+    {
+      "id": "VIG-R004", "name": "Rancongiciel.Generique", "category": "Rançongiciel", "score": 95, "targets": ["pe", "script"],
+      "desc": "Combine suppression des sauvegardes et demande de rançon.",
+      "groups": [
+        { "of": ["vssadmin delete shadows", "shadowcopy delete", "delete shadows /all", "recoveryenabled no", "wbadmin delete"] },
+        { "of": ["your files", "decrypt", "bitcoin", ".onion", "ransom"] }
+      ]
+    },
+    {
+      "id": "VIG-D001", "name": "PowerShell.TelechargementExecution", "category": "Téléchargeur", "score": 75, "targets": ["script", "lnk"], "extensions": [".ps1", ".psm1", ".bat", ".cmd", ".vbs", ".vbe", ".js", ".jse", ".wsf", ".wsh", ".hta", ".sct", ".lnk"],
+      "desc": "Télécharge du code depuis Internet puis l'exécute directement.",
+      "groups": [
+        { "of": ["downloadstring(", "downloadstring (", "downloadfile(", "downloaddata(", "net.webclient", "iwr http", "iwr -uri", "invoke-webrequest http", "invoke-webrequest -uri", "start-bitstransfer", "irm http", "invoke-restmethod http"] },
+        { "of": ["invoke-expression (", "invoke-expression $", "invoke-expression(", "iex(", "iex (", "|iex", "| iex", "iex $", "reflection.assembly]::load("] }
+      ],
+      "exclude": ["chocolatey.org/install.ps1", "get.scoop.sh", "dot.net/v1/dotnet-install.ps1", "aka.ms/install-powershell.ps1"]
+    },
+    {
+      "id": "VIG-D002", "name": "PowerShell.CommandeMasquee", "category": "Script malveillant", "score": 65, "targets": ["script", "lnk"], "extensions": [".ps1", ".psm1", ".bat", ".cmd", ".vbs", ".vbe", ".js", ".jse", ".wsf", ".wsh", ".hta", ".sct", ".lnk"],
+      "desc": "Lance PowerShell en fenêtre cachée avec une commande encodée.",
+      "groups": [
+        { "of": ["-windowstyle hidden", "-w hidden", "-win hidden", "-windowstyle 1", "-w 1 "] },
+        { "of": ["-encodedcommand", "-enc ", "-ec ", "frombase64string", "-e jab", "-e sqb"] }
+      ]
+    },
+    {
+      "id": "VIG-D003", "name": "Script.OutilSystemeDetourne", "category": "Téléchargeur", "score": 70, "targets": ["script", "lnk", "office", "pdf"],
+      "desc": "Détourne un outil Windows légitime pour télécharger ou exécuter du code.",
+      "groups": [ { "of": ["certutil -urlcache", "certutil.exe -urlcache", "certutil -decode", "certutil.exe -decode", "certutil -f -split", "bitsadmin /transfer", "bitsadmin.exe /transfer", "mshta http", "mshta.exe http", "mshta vbscript:", "mshta javascript:", "rundll32 javascript:", "rundll32.exe javascript:", "regsvr32 /s /n /u /i:http", "regsvr32.exe /s /n /u /i:http", "msiexec /q /i http", "msiexec.exe /q /i http"] } ]
+    },
+    {
+      "id": "VIG-D004", "name": "VBScript.Dropper", "category": "Téléchargeur", "score": 80, "targets": ["script", "office"],
+      "desc": "Script qui télécharge un fichier, l'enregistre et l'exécute.",
+      "groups": [
+        { "of": ["wscript.shell", "shell.application"] },
+        { "of": ["msxml2.xmlhttp", "msxml2.serverxmlhttp", "winhttp.winhttprequest", "microsoft.xmlhttp"] },
+        { "of": ["adodb.stream", "savetofile", ".run ", "shellexecute"] }
+      ]
+    },
+    {
+      "id": "VIG-D005", "name": "HTA.Malveillant", "category": "Script malveillant", "score": 70, "targets": ["script"],
+      "desc": "Application HTML qui lance des commandes système.",
+      "groups": [
+        { "of": ["<hta:application"] },
+        { "of": ["wscript.shell", "shell.application", "powershell", "cmd /c", "cmd.exe /c"] }
+      ]
+    },
+    {
+      "id": "VIG-D006", "name": "Raccourci.Piege", "category": "Raccourci piégé", "score": 75, "targets": ["lnk"],
+      "desc": "Raccourci qui lance un interpréteur avec une commande cachée ou distante.",
+      "groups": [
+        { "of": ["powershell", "cmd.exe", "mshta", "wscript", "cscript", "rundll32", "regsvr32", "certutil", "bitsadmin", "conhost"] },
+        { "of": ["http://", "https://", "-enc", "hidden", "frombase64", "iex", "javascript:", "/c start", "%comspec%", "-w 1"] }
+      ]
+    },
+    {
+      "id": "VIG-D007", "name": "Batch.TelechargementLancement", "category": "Téléchargeur", "score": 45, "targets": ["script"], "extensions": [".bat", ".cmd"],
+      "desc": "Script batch qui télécharge puis lance un programme.",
+      "groups": [
+        { "of": ["curl ", "curl.exe", "wget ", "bitsadmin", "certutil", "invoke-webrequest"] },
+        { "of": ["http://", "https://"] },
+        { "of": ["start \"\"", "start /b", "start /min", "%appdata%", "%temp%", "&& start", "& start"] }
+      ]
+    },
+    {
+      "id": "VIG-S001", "name": "PowerShell.ChargeurShellcode", "category": "Cheval de Troie", "score": 85, "targets": ["script"], "extensions": [".ps1", ".psm1", ".bat", ".cmd", ".vbs", ".vbe", ".js", ".jse", ".wsf", ".wsh", ".hta", ".sct", ".lnk"],
+      "desc": "Script qui alloue de la mémoire exécutable et y lance du code.",
+      "groups": [
+        { "of": ["virtualalloc"] },
+        { "of": ["createthread", "createremotethread", "getdelegateforfunctionpointer", "queueuserapc"] },
+        { "of": ["add-type", "dllimport", "interopservices.marshal"] }
+      ]
+    },
+    {
+      "id": "VIG-S002", "name": "PowerShell.ContournementAMSI", "category": "Contournement de sécurité", "score": 90, "targets": ["script"], "extensions": [".ps1", ".psm1", ".bat", ".cmd", ".vbs", ".vbe", ".js", ".jse", ".wsf", ".wsh", ".hta", ".sct", ".lnk"],
+      "desc": "Tente de désactiver l'analyse antivirus des scripts (AMSI).",
+      "groups": [ { "of": ["hex:616D736969 6E6974 6661696C6564", "hex:616D7369 7574696C73", "amsiscanbuffer", "amsicontext"] } ]
+    },
+    {
+      "id": "VIG-S003", "name": "PowerShell.ShellInverse", "category": "Porte dérobée", "score": 80, "targets": ["script"], "extensions": [".ps1", ".psm1", ".bat", ".cmd", ".vbs", ".vbe", ".js", ".jse", ".wsf", ".wsh", ".hta", ".sct", ".lnk"],
+      "desc": "Ouvre une connexion réseau qui exécute les commandes d'un attaquant.",
+      "groups": [
+        { "of": ["net.sockets.tcpclient", "net.sockets.socket"] },
+        { "of": ["getstream()", ".getstream("] },
+        { "of": ["iex", "invoke-expression", "out-string", "cmd.exe"] }
+      ]
+    },
+    {
+      "id": "VIG-S004", "name": "Securite.DesactivationDefender", "category": "Contournement de sécurité", "score": 75, "targets": ["pe", "script", "lnk", "office"],
+      "desc": "Désactive la protection de Microsoft Defender ou le pare-feu Windows.",
+      "groups": [ { "of": ["disablerealtimemonitoring $true", "disablerealtimemonitoring 1", "set-mppreference -disableioavprotection", "netsh advfirewall set allprofiles state off"] } ]
+    },
+    {
+      "id": "VIG-S006", "name": "Securite.ExclusionDefender", "category": "Contournement de sécurité", "score": 45, "targets": ["pe", "script", "lnk", "office"],
+      "desc": "Ajoute des exclusions à Microsoft Defender.",
+      "groups": [ { "of": ["add-mppreference -exclusionpath", "add-mppreference -exclusionprocess", "add-mppreference -exclusionextension"] } ]
+    },
+    {
+      "id": "VIG-S005", "name": "Persistance.CleDemarrage", "category": "Script malveillant", "score": 35, "targets": ["script"],
+      "desc": "Ajoute un programme au démarrage automatique de Windows.",
+      "groups": [
+        { "of": ["\\currentversion\\run", "currentversion\\runonce"] },
+        { "of": ["reg add", "new-itemproperty", "set-itemproperty", "regwrite"] }
+      ]
+    },
+    {
+      "id": "VIG-P001", "name": "Voleur.NavigateursWeb", "category": "Voleur de données", "score": 80, "targets": ["pe", "script"],
+      "desc": "Lit les mots de passe et cookies des navigateurs puis les exfiltre.",
+      "groups": [
+        { "min": 2, "of": ["\\login data", "logins.json", "key4.db", "\\cookies", "\\web data", "\\local state", "wallet.dat"] },
+        { "of": ["cryptunprotectdata", "encrypted_key", "select origin_url", "select host_key", "sqlite3_open"] },
+        { "of": ["api.telegram.org", "discord.com/api/webhooks", "discordapp.com/api/webhooks", "/gate.php", "pastebin.com/raw", "ftp://"] }
+      ]
+    },
+    {
+      "id": "VIG-P002", "name": "Voleur.JetonDiscord", "category": "Voleur de données", "score": 85, "targets": ["pe", "script"],
+      "desc": "Recherche et vole les jetons de connexion Discord.",
+      "groups": [
+        { "of": ["[\\w-]{24}\\.[\\w-]{6}\\.[\\w-]{27}", "mfa\\.[\\w-]{84}"] },
+        { "of": ["discord", "leveldb"] }
+      ]
+    },
+    {
+      "id": "VIG-P003", "name": "Voleur.PortefeuillesCrypto", "category": "Voleur de données", "score": 75, "targets": ["pe", "script"],
+      "desc": "Cible plusieurs portefeuilles de cryptomonnaie.",
+      "groups": [ { "min": 4, "of": ["\\exodus\\", "\\electrum\\wallets", "\\atomic\\local storage", "\\coinomi\\", "\\ethereum\\keystore", "metamask", "nkbihfbeogaeaoehlefnkodbefgpgknn", "\\armory\\", "\\jaxx\\", "wallet.dat"] } ]
+    },
+    {
+      "id": "VIG-K001", "name": "Keylogger.Generique", "category": "Enregistreur de frappe", "score": 70, "targets": ["pe", "script"],
+      "desc": "Enregistre les touches du clavier.",
+      "groups": [ { "min": 5, "of": ["[backspace]", "[enter]", "[capslock]", "[shift]", "[ctrl]", "[tab]", "[esc]", "[del]", "[alt]", "[f1]", "[left]", "[right]"] } ]
+    },
+    {
+      "id": "VIG-H001", "name": "OutilPiratage.Mimikatz", "category": "Outil de piratage", "score": 95, "targets": ["pe", "script"],
+      "desc": "Outil de vol d'identifiants Windows.",
+      "groups": [ { "of": ["hex:73656B75726C7361 3A3A", "hex:6C736164756D70 3A3A", "hex:67656E74696C6B697769"] } ]
+    },
+    {
+      "id": "VIG-M001", "name": "Mineur.Cryptomonnaie", "category": "Mineur de cryptomonnaie", "score": 80, "targets": ["pe", "script", "lnk"],
+      "desc": "Utilise votre processeur pour miner de la cryptomonnaie.",
+      "groups": [
+        { "of": ["stratum+tcp://", "stratum+ssl://", "stratum2+tcp://", "--donate-level", "\"donate-level\""] },
+        { "of": ["xmrig", "cryptonight", "randomx", "nicehash", "--coin", "--algo", "moneroocean", "nanopool.org", "2miners.com", "\"pools\""] }
+      ]
+    },
+    {
+      "id": "VIG-B001", "name": "PorteDerobee.WebShellPHP", "category": "Porte dérobée", "score": 85, "targets": ["script"],
+      "desc": "Page PHP qui exécute les commandes envoyées par un attaquant.",
+      "groups": [ { "of": ["hex:6576616C 28 24 5F 706F7374 5B", "hex:6576616C 28 24 5F 72657175657374 5B", "hex:6576616C 28 6261736536345F6465636F6465 28 24 5F", "hex:617373657274 28 24 5F 706F7374 5B"] } ]
+    },
+    {
+      "id": "VIG-B002", "name": "RAT.njRAT", "category": "Cheval de Troie", "score": 90, "targets": ["pe"],
+      "desc": "Cheval de Troie d'accès à distance njRAT.",
+      "groups": [
+        { "of": ["|'|'|"] },
+        { "of": ["netsh firewall add allowedprogram", "netsh firewall delete allowedprogram", "cmd.exe /c ping 0 -n 2 & del"] }
+      ]
+    },
+    {
+      "id": "VIG-B003", "name": "RAT.Remcos", "category": "Cheval de Troie", "score": 90, "targets": ["pe"],
+      "desc": "Cheval de Troie d'accès à distance Remcos.",
+      "groups": [ { "of": ["remcos_mutex", "breaking-security.net", "remcos agent initialized"] } ]
+    },
+    {
+      "id": "VIG-B004", "name": "RAT.Quasar", "category": "Cheval de Troie", "score": 85, "targets": ["pe"],
+      "desc": "Outil d'accès à distance Quasar.",
+      "groups": [
+        { "of": ["quasar.common", "quasar.client", "xrat.client"] },
+        { "of": ["getkeyloggerlogs", "dokeyloggerlogs", "remoteshell", "doshellexecute"] }
+      ]
+    },
+    {
+      "id": "VIG-W001", "name": "Ver.Autorun", "category": "Ver", "score": 65, "targets": ["script"],
+      "desc": "Fichier autorun.inf qui lance un programme à l'insertion d'un support.",
+      "groups": [
+        { "of": ["[autorun]"] },
+        { "of": ["open=", "shellexecute=", "shell\\open\\command=", "shell\\explore\\command="] }
+      ]
+    },
+    {
+      "id": "VIG-O001", "name": "Document.MacroAutoExecution", "category": "Document piégé", "score": 65, "targets": ["office"],
+      "desc": "Macro qui s'exécute à l'ouverture et lance des commandes.",
+      "groups": [
+        { "of": ["autoopen", "auto_open", "document_open", "workbook_open", "autoexec"] },
+        { "of": ["wscript.shell", "shell.application", "urldownloadtofile", "powershell", "shell(", "winhttp", "xmlhttp", "cmd /c"] }
+      ]
+    },
+    {
+      "id": "VIG-O002", "name": "Document.DDE", "category": "Document piégé", "score": 70, "targets": ["office"],
+      "desc": "Champ DDE qui exécute une commande à l'ouverture du document.",
+      "groups": [
+        { "of": ["ddeauto"] },
+        { "of": ["cmd", "powershell", "mshta"] }
+      ]
+    },
+    {
+      "id": "VIG-F001", "name": "PDF.ActionAutomatique", "category": "Document piégé", "score": 40, "targets": ["pdf"],
+      "desc": "PDF contenant du JavaScript lancé à l'ouverture.",
+      "groups": [
+        { "of": ["/javascript", "/js"] },
+        { "of": ["/openaction", "/aa"] }
+      ]
+    },
+    {
+      "id": "VIG-F002", "name": "PDF.LancementCommande", "category": "Document piégé", "score": 75, "targets": ["pdf"],
+      "desc": "PDF qui tente de lancer un programme.",
+      "groups": [
+        { "of": ["/launch"] },
+        { "of": [".exe", "cmd", "powershell", ".bat", ".vbs"] }
+      ]
+    },
+    {
+      "id": "VIG-L001", "name": "Script.Obfuscation", "category": "Script malveillant", "score": 25, "targets": ["script"],
+      "desc": "Code volontairement rendu illisible.",
+      "groups": [ { "of": ["eval(function(p,a,c,k,e,", "[char]0x", "-join [char[]]", "-bxor", "chrw(", "strreverse("] } ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Programme d'installation : un seul .exe qui contient SPIRUS et l'installe pour l'utilisateur courant. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyName>SPIRUS-Setup</AssemblyName>
+    <RootNamespace>Spirus.Setup</RootNamespace>
+    <AssemblyTitle>Installation de SPIRUS Antivirus</AssemblyTitle>
+    <ApplicationIcon>..\App\Assets\vigie.ico</ApplicationIcon>
+    <ApplicationManifest>..\App\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Page Include="..\App\Theme.xaml" Link="Theme.xaml" />
+    <Resource Include="..\App\Assets\vigie.png" Link="Assets\vigie.png" />
+    <EmbeddedResource Include="..\README.md" LogicalName="payload/README.md" />
+  </ItemGroup>
+
+  <!-- Fichiers de SPIRUS embarqués (fournis par build.ps1 via -p:PayloadDir=...) -->
+  <ItemGroup Condition="'$(PayloadDir)' != ''">
+    <EmbeddedResource Include="$(PayloadDir)\SPIRUS.exe" LogicalName="payload/SPIRUS.exe" />
+    <EmbeddedResource Include="$(PayloadDir)\spirus-cli.exe" LogicalName="payload/spirus-cli.exe" />
+  </ItemGroup>
+
+</Project>

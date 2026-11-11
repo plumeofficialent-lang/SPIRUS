@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <AssemblyName>Vigie.Core</AssemblyName>
+    <RootNamespace>Vigie.Core</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NoWarn>$(NoWarn);CA1416;SYSLIB0057</NoWarn>
+  </PropertyGroup>
+
+  <!-- Les règles de détection (Signatures\rules.json) sont compressées et brouillées à la
+       compilation, puis embarquées dans la DLL. Sans cela, la présence en clair de chaînes
+       typiques de logiciels malveillants ferait réagir les autres antivirus sur SPIRUS lui-même. -->
+  <UsingTask TaskName="VigiePackRules" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Source ParameterType="System.String" Required="true" />
+      <Dest ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.IO.Compression" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+byte[] raw = File.ReadAllBytes(Source);
+using (var ms = new MemoryStream())
+{
+    using (var ds = new DeflateStream(ms, CompressionLevel.Optimal, true))
+    {
+        ds.Write(raw, 0, raw.Length);
+    }
+    byte[] packed = ms.ToArray();
+    for (int i = 0; i < packed.Length; i++)
+    {
+        packed[i] = (byte)(packed[i] ^ (byte)(0xA7 + (i * 31)));
+    }
+    File.WriteAllBytes(Dest, packed);
+}
+]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="VigiePackRulesTarget" BeforeTargets="AssignTargetPaths;BeforeBuild" Inputs="Signatures\rules.json" Outputs="Signatures\rules.vdb">
+    <VigiePackRules Source="$(MSBuildProjectDirectory)\Signatures\rules.json" Dest="$(MSBuildProjectDirectory)\Signatures\rules.vdb" />
+  </Target>
+
+  <ItemGroup>
+    <None Remove="Signatures\rules.vdb" />
+    <EmbeddedResource Include="Signatures\rules.vdb" LogicalName="Vigie.rules.vdb" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,40 @@
+# Publication automatique : chaque étiquette vX.Y.Z envoyée sur GitHub compile l'installeur
+# et crée la release correspondante. Les SPIRUS installés la détectent et se mettent à jour.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Compiler l'installeur
+        shell: pwsh
+        run: |
+          $version = '${{ github.ref_name }}'.TrimStart('v')
+          ./SPIRUS/build.ps1 -Version $version
+
+      - name: Publier la release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $hash = (Get-FileHash dist/SPIRUS-Setup.exe -Algorithm SHA256).Hash.ToLower()
+          $notes = @"
+          Téléchargez **SPIRUS-Setup.exe** et lancez-le pour installer ou mettre à jour SPIRUS.
+          Les SPIRUS déjà installés se mettent à jour tout seuls.
+
+          SHA-256 : $hash
+          "@
+          gh release create '${{ github.ref_name }}' dist/SPIRUS-Setup.exe --title "SPIRUS ${{ github.ref_name }}" --notes $notes
