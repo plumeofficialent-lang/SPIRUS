@@ -51,7 +51,6 @@
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Image Source="Assets/vigie.png" Width="60" Height="60" RenderOptions.BitmapScalingMode="HighQuality">
-                                <Image.Effect><DropShadowEffect Color="#FFFFFF" BlurRadius="22" ShadowDepth="0" Opacity="0.2"/></Image.Effect>
                             </Image>
                             <StackPanel Margin="18,0,0,0" VerticalAlignment="Center">
                                 <TextBlock Text="SPIRUS" FontFamily="{StaticResource DisplayFont}" FontSize="32" FontWeight="Bold"/>
@@ -106,7 +105,6 @@
                 <!-- ======================================== Progression -->
                 <StackPanel x:Name="ProgressPanel" VerticalAlignment="Center" Visibility="Collapsed">
                     <Image Source="Assets/vigie.png" Width="72" Height="72" RenderOptions.BitmapScalingMode="HighQuality">
-                        <Image.Effect><DropShadowEffect Color="#FFFFFF" BlurRadius="26" ShadowDepth="0" Opacity="0.22"/></Image.Effect>
                     </Image>
                     <TextBlock x:Name="ProgressTitle" Text="Installation en cours…" Style="{StaticResource Text.H2}" HorizontalAlignment="Center" Margin="0,22,0,0"/>
                     <ProgressBar x:Name="Bar" Style="{StaticResource Bar}" Maximum="100" Margin="30,22,30,0"/>

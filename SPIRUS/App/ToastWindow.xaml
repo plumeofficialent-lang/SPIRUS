@@ -4,28 +4,28 @@
         WindowStyle="None" AllowsTransparency="True" Background="Transparent" Topmost="True"
         ShowInTaskbar="False" ShowActivated="False" ResizeMode="NoResize" SizeToContent="Height" Width="412"
         FontFamily="{StaticResource UiFont}" Foreground="{StaticResource Text}" Opacity="0">
-    <Border x:Name="Root" Margin="12" CornerRadius="16" Background="#0A0A0A" BorderBrush="#262626" BorderThickness="1">
+    <Border x:Name="Root" Margin="12" CornerRadius="8" Background="#1A1B1E" BorderBrush="#34363B" BorderThickness="1">
         <Border.RenderTransform>
             <TranslateTransform x:Name="Slide" X="60"/>
         </Border.RenderTransform>
         <Border.Effect>
-            <DropShadowEffect BlurRadius="26" ShadowDepth="6" Direction="270" Opacity="0.55" Color="Black"/>
+            <DropShadowEffect BlurRadius="18" ShadowDepth="4" Direction="270" Opacity="0.4" Color="Black"/>
         </Border.Effect>
         <Grid>
-            <Border x:Name="AccentBar" Width="4" HorizontalAlignment="Left" CornerRadius="16,0,0,16" Background="{StaticResource DangerGradient}"/>
+            <Border x:Name="AccentBar" Width="3" HorizontalAlignment="Left" CornerRadius="8,0,0,8" Background="{StaticResource DangerGradient}"/>
             <Grid Margin="20,16,14,16">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Border x:Name="Badge" Width="38" Height="38" CornerRadius="11" Background="{StaticResource DangerSoft}" VerticalAlignment="Top">
+                <Border x:Name="Badge" Width="22" Height="22" Background="Transparent" VerticalAlignment="Top">
                     <TextBlock x:Name="Glyph" Style="{StaticResource Text.Icon}" FontSize="18" HorizontalAlignment="Center" Foreground="{StaticResource Danger}" Text="&#xE7BA;"/>
                 </Border>
                 <StackPanel Grid.Column="1" Margin="14,0,8,0">
-                    <TextBlock x:Name="AppLabel" Text="SPIRUS ANTIVIRUS" Style="{StaticResource Text.Caption}"/>
-                    <TextBlock x:Name="TitleText" Style="{StaticResource Text.H3}" FontSize="15.5" Margin="0,3,0,0" TextWrapping="Wrap"/>
-                    <TextBlock x:Name="MessageText" FontSize="13" Margin="0,5,0,0" TextWrapping="Wrap" Foreground="#D0D0D0"/>
+                    <TextBlock x:Name="AppLabel" Text="SPIRUS" Style="{StaticResource Text.Caption}"/>
+                    <TextBlock x:Name="TitleText" Style="{StaticResource Text.H3}" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                    <TextBlock x:Name="MessageText" FontSize="13" Margin="0,5,0,0" TextWrapping="Wrap" Foreground="{StaticResource Text}"/>
                     <TextBlock x:Name="DetailText" Style="{StaticResource Text.Muted}" FontSize="12" Margin="0,4,0,0" MaxHeight="54" TextTrimming="CharacterEllipsis"/>
                     <TextBlock x:Name="ErrorText" FontSize="12" Margin="0,6,0,0" TextWrapping="Wrap" Foreground="{StaticResource Danger}" Visibility="Collapsed"/>
                     <WrapPanel x:Name="Actions" Margin="0,12,0,0"/>

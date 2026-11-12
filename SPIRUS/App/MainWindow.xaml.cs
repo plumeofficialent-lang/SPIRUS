@@ -72,12 +72,11 @@ public partial class MainWindow : Window
             _g.Quarantine.Changed -= _onQuarantine;
             _g.ScanStarted -= _onScanStarted;
             _g.ScanCompleted -= _onScanCompleted;
-            StopPulse();
             PageHost.Content = null;
             if (!_g.Settings.MinimizeToTray && !App.Exiting && !App.SnapshotMode) App.Instance.ExitApplication();
         };
 
-        ModeLabel.Text = _g.IsElevated ? "MODE ADMINISTRATEUR" : "";
+        ModeLabel.Text = _g.IsElevated ? "Administrateur" : "";
         DragEnter += OnDragEnter;
         DragLeave += OnDragLeave;
         Drop += OnDrop;
@@ -86,7 +85,6 @@ public partial class MainWindow : Window
             RootGrid.Margin = WindowState == WindowState.Maximized ? new Thickness(7) : new Thickness(0);
             MaxButton.Content = WindowState == WindowState.Maximized ? "" : "";
         };
-        StartPulse();
         RefreshAll();
     }
 
@@ -154,30 +152,11 @@ public partial class MainWindow : Window
         bool ok = _g.FullyProtected;
         var brush = (Brush)FindResource(ok ? "Accent" : "Warning");
         StatusDot.Fill = brush;
-        StatusPulse.Fill = brush;
         SideStatus.Text = ok ? "Protection active" : "Protection incomplète";
         SideDetail.Text = ok ? $"{_g.Engine.SignatureCount:N0} signatures chargées" : "Des protections sont désactivées";
         int q = _g.Quarantine.Count;
         QuarantineBadge.Visibility = q > 0 ? Visibility.Visible : Visibility.Collapsed;
         QuarantineCount.Text = q.ToString();
-    }
-
-    private void StartPulse()
-    {
-        var scale = (ScaleTransform)StatusPulse.RenderTransform;
-        var duration = TimeSpan.FromSeconds(1.8);
-        var grow = new DoubleAnimation(1, 2.4, duration) { RepeatBehavior = RepeatBehavior.Forever };
-        scale.BeginAnimation(ScaleTransform.ScaleXProperty, grow);
-        scale.BeginAnimation(ScaleTransform.ScaleYProperty, grow);
-        StatusPulse.BeginAnimation(OpacityProperty, new DoubleAnimation(0.55, 0, duration) { RepeatBehavior = RepeatBehavior.Forever });
-    }
-
-    private void StopPulse()
-    {
-        var scale = (ScaleTransform)StatusPulse.RenderTransform;
-        scale.BeginAnimation(ScaleTransform.ScaleXProperty, null);
-        scale.BeginAnimation(ScaleTransform.ScaleYProperty, null);
-        StatusPulse.BeginAnimation(OpacityProperty, null);
     }
 
     // ------------------------------------------------------------ glisser-déposer

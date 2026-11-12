@@ -26,46 +26,13 @@ public partial class DashboardPage : UserControl, IPage
     {
         _g = guardian;
         InitializeComponent();
-        // Les animations ne tournent que lorsque la page est affichée.
-        Loaded += (_, _) => StartAnimations();
-        Unloaded += (_, _) => StopAnimations();
         Refresh();
-    }
-
-    private void StopAnimations()
-    {
-        foreach (var ring in new[] { Ring1, Ring2 })
-        {
-            var scale = (ScaleTransform)ring.RenderTransform;
-            scale.BeginAnimation(ScaleTransform.ScaleXProperty, null);
-            scale.BeginAnimation(ScaleTransform.ScaleYProperty, null);
-            ring.BeginAnimation(OpacityProperty, null);
-        }
-        ((RotateTransform)RingSpin.RenderTransform).BeginAnimation(RotateTransform.AngleProperty, null);
-        ShieldGlow.BeginAnimation(System.Windows.Media.Effects.DropShadowEffect.BlurRadiusProperty, null);
-    }
-
-    private void StartAnimations()
-    {
-        var period = TimeSpan.FromSeconds(2.8);
-        foreach (var (ring, delay) in new[] { (Ring1, 0.0), (Ring2, 1.4) })
-        {
-            var scale = (ScaleTransform)ring.RenderTransform;
-            var grow = new DoubleAnimation(0.6, 1.0, period) { BeginTime = TimeSpan.FromSeconds(delay), RepeatBehavior = RepeatBehavior.Forever, EasingFunction = new SineEase { EasingMode = EasingMode.EaseOut } };
-            scale.BeginAnimation(ScaleTransform.ScaleXProperty, grow);
-            scale.BeginAnimation(ScaleTransform.ScaleYProperty, grow);
-            ring.BeginAnimation(OpacityProperty, new DoubleAnimation(0.6, 0, period) { BeginTime = TimeSpan.FromSeconds(delay), RepeatBehavior = RepeatBehavior.Forever });
-        }
-        ((RotateTransform)RingSpin.RenderTransform).BeginAnimation(RotateTransform.AngleProperty,
-            new DoubleAnimation(0, 360, TimeSpan.FromSeconds(30)) { RepeatBehavior = RepeatBehavior.Forever });
-        ShieldGlow.BeginAnimation(System.Windows.Media.Effects.DropShadowEffect.BlurRadiusProperty,
-            new DoubleAnimation(30, 56, TimeSpan.FromSeconds(2.2)) { AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever, EasingFunction = new SineEase() });
     }
 
     public void Refresh()
     {
-        var hour = DateTime.Now.Hour;
-        Greeting.Text = $"{(hour < 5 || hour >= 18 ? "Bonsoir" : "Bonjour")} ! Voici l'état de la sécurité de votre ordinateur.";
+        var today = DateTime.Now.ToString("dddd d MMMM", new System.Globalization.CultureInfo("fr-FR"));
+        Greeting.Text = char.ToUpper(today[0]) + today[1..];
         UpdateHero();
 
         var s = _g.Settings;
@@ -128,7 +95,7 @@ public partial class DashboardPage : UserControl, IPage
         }
         else if (state == "ok")
         {
-            HeroSubtitle.Text = "SPIRUS surveille en permanence vos fichiers, vos programmes et vos clés USB. "
+            HeroSubtitle.Text = "Fichiers, programmes et clés USB sous surveillance. "
                                 + (s.LastScanDate == null ? "Lancez une première analyse pour vérifier votre ordinateur." : $"Dernière analyse : {Format.Ago(s.LastScanDate).ToLowerInvariant()}.");
         }
         if (state == _heroState) return;
@@ -136,11 +103,8 @@ public partial class DashboardPage : UserControl, IPage
 
         bool warn = state == "warn";
         var solid = (Brush)FindResource(warn ? "Warning" : state == "scan" ? "Info" : "Accent");
-        ShieldPath.Fill = (Brush)FindResource(warn ? "WarningGradient" : "AccentGradient");
-        ShieldGlow.Color = warn ? Color.FromRgb(0xE0, 0xA0, 0x30) : Colors.White;
-        GlowStop.Color = ShieldGlow.Color;
-        ShieldMark.Data = Geometry.Parse(warn ? "M128,70 L128,142 M128,190 L128,191" : "M78,130 L114,166 L180,96");
-        Ring1.Stroke = Ring2.Stroke = RingSpin.Stroke = solid;
+        ShieldPath.Fill = solid;
+        ShieldMark.Data = Geometry.Parse(warn ? "M128,70 L128,142 M128,190 L128,191" : state == "scan" ? "M128,84 L128,134 L160,152" : "M78,130 L114,166 L180,96");
         StatusChip.Background = (Brush)FindResource(warn ? "WarningSoft" : state == "scan" ? "InfoSoft" : "AccentSoft");
         StatusChipText.Foreground = solid;
         FixButton.Visibility = warn ? Visibility.Visible : Visibility.Collapsed;
@@ -150,17 +114,17 @@ public partial class DashboardPage : UserControl, IPage
         switch (state)
         {
             case "scan":
-                StatusChipText.Text = "●  ANALYSE EN COURS";
-                HeroTitle.Text = "Analyse en cours…";
+                StatusChipText.Text = "En cours";
+                HeroTitle.Text = "Analyse en cours";
                 break;
             case "ok":
-                StatusChipText.Text = "●  PROTECTION ACTIVE";
-                HeroTitle.Text = "Vous êtes protégé";
+                StatusChipText.Text = "Actif";
+                HeroTitle.Text = "Votre ordinateur est protégé";
                 break;
             default:
                 var off = BuildModules().Where(m => !m.On && m.Name != "Moteur Windows (AMSI)" && m.Name != "Contrôle des clés USB").Select(m => m.Name.ToLowerInvariant()).ToList();
-                StatusChipText.Text = "●  PROTECTION INCOMPLÈTE";
-                HeroTitle.Text = "Votre protection est incomplète";
+                StatusChipText.Text = "Incomplet";
+                HeroTitle.Text = "Protection incomplète";
                 HeroSubtitle.Text = off.Count > 0 ? $"Désactivé : {string.Join(", ", off)}. Réactivez-les pour rester protégé." : "Certaines protections sont désactivées.";
                 break;
         }

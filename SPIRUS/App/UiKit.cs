@@ -23,19 +23,16 @@ public static class UiKit
 
     private static Border BadgeCore(string glyph, string tone) => new()
     {
-        Width = 40,
-        Height = 40,
-        CornerRadius = new CornerRadius(11),
-        Background = R<Brush>(tone + "Soft"),
+        Width = 20,
         VerticalAlignment = VerticalAlignment.Center,
-        Child = Icon(glyph, tone)
+        Child = Icon(glyph, tone == "Danger" ? "Danger" : "TextMuted", 16)
     };
 
     public static TextBlock SectionTitle(string text) => new()
     {
-        Text = text.ToUpperInvariant(),
-        Style = R<Style>("Text.Caption"),
-        Margin = new Thickness(4, 22, 0, 10)
+        Text = text,
+        Style = R<Style>("Text.H3"),
+        Margin = new Thickness(2, 22, 0, 8)
     };
 
     /// <summary>Ligne : icône, titre, description et un contrôle à droite.</summary>
@@ -48,8 +45,8 @@ public static class UiKit
 
         if (glyph != null) grid.Children.Add(Badge(glyph, tone));
 
-        var texts = new StackPanel { Margin = new Thickness(glyph != null ? 16 : 0, 0, 16, 0), VerticalAlignment = VerticalAlignment.Center };
-        texts.Children.Add(new TextBlock { Text = title, FontWeight = FontWeights.SemiBold, FontSize = 14, TextWrapping = TextWrapping.Wrap });
+        var texts = new StackPanel { Margin = new Thickness(glyph != null ? 14 : 0, 0, 16, 0), VerticalAlignment = VerticalAlignment.Center };
+        texts.Children.Add(new TextBlock { Text = title, FontSize = 13.5, TextWrapping = TextWrapping.Wrap });
         if (!string.IsNullOrEmpty(description))
             texts.Children.Add(new TextBlock { Text = description, Style = R<Style>("Text.Muted"), Margin = new Thickness(0, 3, 0, 0) });
         Grid.SetColumn(texts, 1);
@@ -61,7 +58,7 @@ public static class UiKit
             Grid.SetColumn(right, 2);
             grid.Children.Add(right);
         }
-        return new Border { Style = R<Style>("Row"), Padding = new Thickness(18, 14, 18, 14), Child = grid };
+        return new Border { Style = R<Style>("Row"), Padding = new Thickness(16, 11, 16, 11), Child = grid };
     }
 
     public static Border Toggle(string glyph, string title, string description, bool value, Action<bool> changed, bool enabled = true, string tone = "Accent")

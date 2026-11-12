@@ -170,7 +170,7 @@ public partial class ScanPage : UserControl, IPage
         RunTitle.Text = s.Cancelled ? "Analyse interrompue" : clean ? "Aucune menace détectée" : $"{s.ThreatCount} menace(s) détectée(s)";
         RunSubtitle.Text = $"{Guardian.KindLabel(s.Kind)} — {s.FilesScanned:N0} fichiers examinés en {Format.Duration(s.Duration)}"
                            + (s.Errors > 0 ? $" ({s.Errors:N0} fichiers illisibles ou protégés)." : ".");
-        CurrentLabel.Text = "RÉSULTAT";
+        CurrentLabel.Text = "Résultat";
         CurrentFile.Text = clean ? "Votre ordinateur est sain. SPIRUS continue de veiller en arrière-plan." : "Choisissez une action pour chaque élément ci-dessous.";
         CountScanned.Text = s.FilesScanned.ToString("N0");
         CountThreats.Text = s.ThreatCount.ToString();

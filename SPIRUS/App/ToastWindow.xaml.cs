@@ -33,7 +33,6 @@ public partial class ToastWindow : Window
         };
         AccentBar.Background = (Brush)FindResource(gradient);
         TimerBar.Background = (Brush)FindResource(gradient);
-        Badge.Background = (Brush)FindResource(soft);
         Glyph.Foreground = (Brush)FindResource(solid);
         Glyph.Text = glyph;
         TitleText.Text = title;
